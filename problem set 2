@@ -1,11 +1,17 @@
+
+    
+
 def rot13(s):
-    abcd=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z']
-    l = len(abcd)
-    s2=''
+    abcd = 'abcdefghikjlmnopqrstuvwxyz'
+    ABCD = abcd.upper()
+    abcd_len = len(abcd)
+    s2 = ''
     for i in range(len(s)):
-        if s[i] not in abcd:
-            s2 += s[i]	# keep punctuation characters
-        else:
-            #print abcd.index(s[i]), abcd.index(s[i])+13, (abcd.index(s[i])+13) % l
-            s2 += abcd[(abcd.index(s[i]) + 13) % l]
+        c = s[i]
+        if c.isalpha():
+            if c in abcd:
+                c = abcd[(abcd.index(cc) + 13) % abcd_len]
+            else:
+                c = ABCD[(ABCD.index(cc) + 13) % abcd_len]
+        s2 += c
     return s2
