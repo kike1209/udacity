@@ -1,17 +1,76 @@
+import webapp2
+
+form="""
+<form method="post">
+    What is your birthdate?
+    <br>
+    <label> Month:
+        <input type="text" name="month">
+    </label>
+    <label> Day:
+        <input type="text" name="day">
+    </label>
+    <label> Year:
+        <input type="text" name="year">
+    </label>
+    <br>
+    <br>
+    <input type="submit">
+</form>
+"""
+
+def esc_html(s):
+    esc_dicc = {'<':'&lt;', '>':'&gt;', '"':'&quot;', '&':'&amp;'}
+    s = s.replace(r'<', esc_dicc['<'])
+    s = s.replace(r'>', esc_dicc['>'])
+    s = s.replace(r'"', esc_dicc['"'])
+    s = s.replace(r'&', esc_dicc['&'])
+    return s
 
     
-
 def rot13(s):
     abcd = 'abcdefghikjlmnopqrstuvwxyz'
     ABCD = abcd.upper()
     abcd_len = len(abcd)
     s2 = ''
     for i in range(len(s)):
-        c = s[i]
-        if c.isalpha():
-            if c in abcd:
-                c = abcd[(abcd.index(cc) + 13) % abcd_len]
+        cc = s[i]
+        if cc.isalpha():
+            if cc in abcd:
+                cc = abcd[(abcd.index(cc) + 13) % abcd_len]
             else:
-                c = ABCD[(ABCD.index(cc) + 13) % abcd_len]
-        s2 += c
-    return s2
+                cc = ABCD[(ABCD.index(cc) + 13) % abcd_len]
+        s2 += cc
+    return esc_html(s2)
+
+
+class MainPage(webapp2.RequestHandler):
+    def write_form(self, error='', month='', day='', year=''):
+        self.response.out.write(form % {'error': error,
+                                        'month': esc_html(month),
+                                        'day': esc_html(day),
+                                        'year': esc_html(year)})
+                                        
+    def get(self):
+        self.write_form()
+        
+    def post(self):
+        user_month = self.request.get('month')
+        user_day = self.request.get('day')
+        user_year = self.request.get('year')
+        
+        month = valid_month(user_month)
+        day = valid_month(user_day)
+        year = valid_month(user_year)
+        
+        if not (month and day and year):
+            self.write_form('Invalid date', user_month, user_day, user_year)
+        else:
+            self.redirect("/thanks")
+            
+class ThanksHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.out.write("That's a totally valid day")
+
+
+application = webapp2.WSGIApplication([('/', MainPage)], [('/thanks', ThanksHandler)], debug=True)
