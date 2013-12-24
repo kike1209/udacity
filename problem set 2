@@ -1,8 +1,7 @@
+#import cgi
 import webapp2
 
 form="""
-<!DOCTYPE html>
-
 <html>
   <head>
     <title>Unit 2 Rot 13</title>
@@ -11,8 +10,8 @@ form="""
   <body>
     <h2>Enter some text to ROT13:</h2>
     <form method="post">
-      <textarea name="text"
-                style="height: 100px; width: 400px;">
+      <textarea name="text" rows="10" cols="50">
+      %(textrot13)s          
       </textarea>
       <br>
       <input type="submit">
@@ -49,14 +48,16 @@ def rot13(s):
 
 class MainPage(webapp2.RequestHandler):
     def write_form(self, text=""):
-        self.response.out.write(form % text)
+        self.response.out.write(form % {'textrot13': text})
                                         
     def get(self):
         self.write_form()
         
     def post(self):
         user_text = self.request.get('text')
-        self.write_form(rot13(user_text))
+        rot13_text = rot13(user_text)
+        self.response.out.write('['+rot13_text+']') ###########
+        self.write_form(rot13_text)
         
 
 application = webapp2.WSGIApplication([('/', MainPage)], debug=True)
